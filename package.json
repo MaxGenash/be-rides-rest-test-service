@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "A coding assessment for Xendit backend interviews",
   "main": "index.js",
+  "engines": {
+    "node": ">8.6 <= 10",
+    "npm": ">=v6.11.3 <7"
+  },
   "directories": {
     "test": "tests"
   },
