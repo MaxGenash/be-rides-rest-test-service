@@ -43,10 +43,10 @@ Please implement the following tooling:
 #### Success Criteria
 
 1. Create commit to `master` with the new tooling and merge it
-   1. `eslint` should have an opinionated format
-   2. `nyc` should aim for test coverage of `80%` across lines, statements, and branches
-   3. `pre-push` should run the tests before allowing pushing using `git`
-   4. `winston` should be used to replace console logs and all errors should be logged as well. Logs should go to disk.
+    1. `eslint` should have an opinionated format
+    2. `nyc` should aim for test coverage of `80%` across lines, statements, and branches
+    3. `pre-push` should run the tests before allowing pushing using `git`
+    4. `winston` should be used to replace console logs and all errors should be logged as well. Logs should go to disk.
 2. Ensure that tooling is connected to `npm test`
 3. Create a separate commit to `master` with the linter fixes and merge it
 4. Create a separate commit to `master` to increase code coverage to acceptable thresholds and merge it
@@ -64,8 +64,8 @@ Please implement the following refactors of the code:
 #### Success Criteria
 
 1. Commit to `master` for each of the refactors above with:
-   1. Code changes
-   2. Tests
+    1. Code changes
+    2. Tests
 
 ### Security
 
@@ -77,8 +77,8 @@ Please implement the following security controls for your system:
 #### Success Criteria
 
 1. Commit to `master` with:
-   1. Changes to the code
-   2. Tests ensuring the vulnerability is addressed
+    1. Changes to the code
+    2. Tests ensuring the vulnerability is addressed
 
 ### Load Testing
 
@@ -87,6 +87,6 @@ Please implement load testing to ensure your service can handle a high amount of
 #### Success Criteria
 
 1. Implement load testing using `artillery`
-   1. Create a PR against `master` including artillery
-   2. Ensure that load testing is able to be run using `npm test:load`. You can consider using a tool like `forever` to spin up a daemon and kill it after the load test has completed.
-   3. Test all endpoints under at least `100 rps` for `30s` and ensure that `p99` is under `50ms`
+    1. Create a PR against `master` including artillery
+    2. Ensure that load testing is able to be run using `npm test:load`. You can consider using a tool like `forever` to spin up a daemon and kill it after the load test has completed.
+    3. Test all endpoints under at least `100 rps` for `30s` and ensure that `p99` is under `50ms`

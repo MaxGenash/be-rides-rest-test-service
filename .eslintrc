@@ -1,27 +1,27 @@
 {
-  "env": {
-    "es2022": true,
-    "jest/globals": true,
-    "node": true
-  },
-  "extends": [
-    "eslint:recommended",
-    "airbnb-base",
-    "plugin:jest/recommended",
-    "plugin:jest/style",
-    "prettier",
-    "plugin:prettier/recommended"
-  ],
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaVersion": 2022,
-    "ecmaFeatures": {
-      "impliedStrict": true
+    "env": {
+        "es2022": true,
+        "jest/globals": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "airbnb-base",
+        "plugin:jest/recommended",
+        "plugin:jest/style",
+        "prettier",
+        "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 2022,
+        "ecmaFeatures": {
+            "impliedStrict": true
+        }
+    },
+    "plugins": ["jest", "prettier"],
+    "rules": {
+        "prettier/prettier": "warn",
+        "no-console": "warn"
     }
-  },
-  "plugins": ["jest", "prettier"],
-  "rules": {
-    "prettier/prettier": "warn",
-    "no-console": "warn"
-  }
 }
