@@ -1,0 +1,8 @@
+.idea
+.vscode
+node_modules
+coverage
+__generated__
+build
+dist
+.DS_Store
