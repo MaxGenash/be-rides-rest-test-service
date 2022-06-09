@@ -9,6 +9,7 @@ The goal of these exercises are to assess your proficiency in software engineeri
 3. Run `npm test`
 4. Run `npm start`
 5. Hit the server to test health `curl localhost:8010/health` and expect a `200` response
+6. The full list of available endpoints with detailed descriptions is available at `localhost:8010/api-docs`
 
 ## Tasks
 

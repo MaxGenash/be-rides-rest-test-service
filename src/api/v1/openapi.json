@@ -1,0 +1,287 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Xendit Rides service",
+    "description": "The goal of this project is to assess your proficiency in software engineering that is related to the daily work that we do at Xendit"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8010"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Returns server health information",
+        "operationId": "getHealth",
+        "tags": [
+          "health"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Health information from the server",
+            "content": {
+              "text/plain": {}
+            }
+          }
+        }
+      }
+    },
+    "/rides": {
+      "post": {
+        "summary": "Create a ride record",
+        "operationId": "createRides",
+        "tags": [
+          "rides"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewRideRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created ride records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {"$ref": "#/components/schemas/Rides"},
+                    {"$ref": "#/components/schemas/ValidationError"},
+                    {"$ref": "#/components/schemas/ServerError"}
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List all rides",
+        "operationId": "listRides",
+        "tags": [
+          "rides"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of found rides",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {"$ref": "#/components/schemas/Rides"},
+                    {"$ref": "#/components/schemas/RidesNotFoundError"},
+                    {"$ref": "#/components/schemas/ServerError"}
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rides/{id}": {
+      "get": {
+        "summary": "Info for a specific ride",
+        "operationId": "getRideById",
+        "tags": [
+          "rides"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The id of the ride to retrieve",
+            "schema": {
+              "type": "number",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Found ride records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {"$ref": "#/components/schemas/Rides"},
+                    {"$ref": "#/components/schemas/RidesNotFoundError"},
+                    {"$ref": "#/components/schemas/ServerError"}
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateNewRideRequest": {
+        "description": "Data used to create a new ride",
+        "type": "object",
+        "required": [
+          "start_lat",
+          "start_long",
+          "end_lat",
+          "end_long",
+          "rider_name",
+          "driver_name",
+          "driver_vehicle"
+        ],
+        "properties": {
+          "start_lat": {
+            "$ref": "#/components/schemas/Latitude"
+          },
+          "start_long": {
+            "$ref": "#/components/schemas/Longitude"
+          },
+          "end_lat": {
+            "$ref": "#/components/schemas/Latitude"
+          },
+          "end_long": {
+            "$ref": "#/components/schemas/Longitude"
+          },
+          "rider_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "driver_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "driver_vehicle": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "Ride": {
+        "description": "Information about a ride",
+        "type": "object",
+        "required": [
+          "rideID",
+          "startLat",
+          "startLong",
+          "endLat",
+          "endLong",
+          "riderName",
+          "driverName",
+          "driverVehicle",
+          "created"
+        ],
+        "properties": {
+          "rideID": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "startLat": {
+            "$ref": "#/components/schemas/Latitude"
+          },
+          "startLong": {
+            "$ref": "#/components/schemas/Longitude"
+          },
+          "endLat": {
+            "$ref": "#/components/schemas/Latitude"
+          },
+          "endLong": {
+            "$ref": "#/components/schemas/Longitude"
+          },
+          "riderName": {
+            "type": "string"
+          },
+          "driverName": {
+            "type": "string"
+          },
+          "driverVehicle": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Rides": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Ride"
+        }
+      },
+      "Latitude": {
+        "description": "Geolocation latitude",
+        "type": "number",
+        "format": "float",
+        "minimum": -90,
+        "maximum": 90
+      },
+      "Longitude": {
+        "description": "Geolocation longitude",
+        "type": "number",
+        "format": "float",
+        "minimum": -180,
+        "maximum": 180
+      },
+      "RidesNotFoundError": {
+        "description": "Could not find any rides",
+        "type": "object",
+        "required": [
+          "error_code",
+          "message"
+        ],
+        "properties": {
+          "error_code": {
+            "type": "string",
+            "enum": ["RIDES_NOT_FOUND_ERROR"]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "The request contains invalid data",
+        "type": "object",
+        "required": [
+          "error_code",
+          "message"
+        ],
+        "properties": {
+          "error_code": {
+            "type": "string",
+            "enum": ["VALIDATION_ERROR"]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Unexpected error",
+        "type": "object",
+        "required": [
+          "error_code",
+          "message"
+        ],
+        "properties": {
+          "error_code": {
+            "type": "string",
+            "enum": ["SERVER_ERROR"]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
