@@ -4,8 +4,8 @@
   "description": "A coding assessment for Xendit backend interviews",
   "main": "index.js",
   "engines": {
-    "node": ">8.6 <= 10",
-    "npm": ">=v6.11.3 <7"
+    "node": ">=16 <17",
+    "npm": ">=8 <9"
   },
   "directories": {
     "test": "tests"

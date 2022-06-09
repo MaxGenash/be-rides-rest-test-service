@@ -4,7 +4,8 @@ The goal of these exercises are to assess your proficiency in software engineeri
 
 ## Setup
 
-1. Ensure `node (>8.6 and <= 10)` and `npm` are installed
+1. Ensure `node (>=16 <17)` and `npm (>=6 <9)` are installed.
+   If you have [Node Version Manager](https://github.com/nvm-sh/nvm), just run `nvm use` in the root folder of the project.
 2. Run `npm install`
 3. Run `npm test`
 4. Run `npm start`
