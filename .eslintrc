@@ -1,11 +1,14 @@
 {
   "env": {
     "es2022": true,
+    "jest/globals": true,
     "node": true
   },
   "extends": [
     "eslint:recommended",
     "airbnb-base",
+    "plugin:jest/recommended",
+    "plugin:jest/style",
     "prettier",
     "plugin:prettier/recommended"
   ],
@@ -16,7 +19,7 @@
       "impliedStrict": true
     }
   },
-  "plugins": ["prettier"],
+  "plugins": ["jest", "prettier"],
   "rules": {
     "prettier/prettier": "warn",
     "no-console": "warn"
