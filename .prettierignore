@@ -6,3 +6,5 @@ __generated__
 build
 dist
 .DS_Store
+logs
+*.log

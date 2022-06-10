@@ -1,13 +1,25 @@
 const express = require('express');
+const expressWinston = require('express-winston');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./api/v1/openapi.json');
+const logger = require('./common/logger');
+const { isDevEnv } = require('./utils/envUtils');
 
 const app = express();
 const jsonParser = bodyParser.json();
 
 module.exports = (db) => {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+    app.use(
+        expressWinston.logger({
+            meta: isDevEnv,
+            winstonInstance: logger,
+            statusLevels: true,
+            expressFormat: true,
+        }),
+    );
 
     app.get('/health', (req, res) => res.send('Healthy'));
 
@@ -77,6 +89,7 @@ module.exports = (db) => {
             values,
             function insertCallback(insertErr) {
                 if (insertErr) {
+                    logger.error('Failed to insert a Rides record:', insertErr);
                     return res.send({
                         error_code: 'SERVER_ERROR',
                         message: 'Unknown error',
@@ -88,6 +101,10 @@ module.exports = (db) => {
                     this.lastID,
                     (findLastResultErr, rows) => {
                         if (findLastResultErr) {
+                            logger.error(
+                                'Failed to retrieve a created Ride record:',
+                                findLastResultErr,
+                            );
                             return res.send({
                                 error_code: 'SERVER_ERROR',
                                 message: 'Unknown error',
@@ -102,8 +119,9 @@ module.exports = (db) => {
     });
 
     app.get('/rides', (req, res) => {
-        db.all('SELECT * FROM Rides', (err, rows) => {
-            if (err) {
+        db.all('SELECT * FROM Rides', (error, rows) => {
+            if (error) {
+                logger.error('Failed to find Rides records:', error);
                 return res.send({
                     error_code: 'SERVER_ERROR',
                     message: 'Unknown error',
@@ -122,8 +140,9 @@ module.exports = (db) => {
     });
 
     app.get('/rides/:id', (req, res) => {
-        db.all(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`, (err, rows) => {
-            if (err) {
+        db.all(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`, (error, rows) => {
+            if (error) {
+                logger.error('Failed to insert a ride record to DB:', error);
                 return res.send({
                     error_code: 'SERVER_ERROR',
                     message: 'Unknown error',
@@ -138,6 +157,32 @@ module.exports = (db) => {
             }
 
             return res.send(rows);
+        });
+    });
+
+    app.use((req, res) => {
+        res.status(404).send({
+            error_code: 'NOT_FOUND',
+            message: 'Not found',
+        });
+    });
+
+    app.use(
+        expressWinston.errorLogger({
+            winstonInstance: logger,
+            meta: true,
+            statusLevels: true,
+            expressFormat: true,
+        }),
+    );
+
+    // eslint-disable-next-line no-unused-vars
+    app.use((error, req, res, next) => {
+        logger.error('Unhandled middleware error:', error);
+        res.status(error.status || 500);
+        res.send({
+            error_code: 'SERVER_ERROR',
+            message: 'Unknown error',
         });
     });
 
