@@ -3,13 +3,12 @@ const expressWinston = require('express-winston');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./api/v1/openapi.json');
-const logger = require('./common/logger');
 const { isDevEnv } = require('./utils/envUtils');
 
 const app = express();
 const jsonParser = bodyParser.json();
 
-module.exports = (db) => {
+module.exports = (db, logger) => {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use(

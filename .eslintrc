@@ -21,6 +21,7 @@
     },
     "plugins": ["jest", "prettier"],
     "rules": {
+        "class-methods-use-this": "off",
         "prettier/prettier": "warn",
         "no-console": "warn"
     }
