@@ -1,12 +1,12 @@
-const request = require('supertest');
-const createApp = require('../src/app');
-const { db, initDB } = require('../src/common/db/sqlLiteDriver');
-const { generateRideReqDTO } = require('./helpers/factories/rides');
-const RidesRepo = require('../src/rides/repositories/RidesRepo');
-const RidesMapper = require('../src/rides/mappers/RidesMapper');
-const loggerMock = require('../src/common/logger');
+import request from 'supertest';
+import createApp from '../app';
+import { db, initDB } from '../common/db/sqlLiteDriver';
+import { generateRideReqDTO } from './helpers/factories/rides';
+import RidesRepo from '../rides/repositories/RidesRepo';
+import RidesMapper from '../rides/mappers/RidesMapper';
+import loggerMock from '../common/logger';
 
-jest.mock('../src/common/logger');
+jest.mock('../common/logger');
 
 const app = createApp(db, loggerMock);
 const ridesRepo = new RidesRepo(db);

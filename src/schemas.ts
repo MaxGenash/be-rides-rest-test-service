@@ -1,6 +1,7 @@
-const { promisify } = require('util');
+import { promisify } from 'util';
+import { DBDriver } from './common/db/types';
 
-module.exports = async (db) => {
+export default async (db: DBDriver) => {
     const createRideTableSchema = `
         CREATE TABLE Rides
         (

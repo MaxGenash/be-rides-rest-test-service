@@ -2,8 +2,17 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
+    preset: 'ts-jest',
+    transform: {
+        '^.+\\.ts?$': 'ts-jest',
+    },
     collectCoverage: false,
-    collectCoverageFrom: ['./src/**/*.js'],
+    collectCoverageFrom: [
+        './src/**/*.{ts,js}',
+        '!**/node_modules/**',
+        '!**/__tests__/**',
+        '!./src/index.ts',
+    ],
     coverageDirectory: './coverage',
     coverageThreshold: {
         global: {
@@ -13,7 +22,8 @@ module.exports = {
             statements: 80,
         },
     },
-    moduleFileExtensions: ['js', 'json', 'node'],
+    moduleFileExtensions: ['ts', 'js', 'json', 'node'],
     testEnvironment: 'node',
-    testMatch: ['**/__tests__/**/*.[jt]s', '**/?(*.)+(spec|test).[tj]s'],
+    testMatch: ['**/?(*.)+(spec|test).[tj]s'],
+    testPathIgnorePatterns: ['build/', 'coverage/', 'node_modules/', 'src(/__tests__/helpers)'],
 };

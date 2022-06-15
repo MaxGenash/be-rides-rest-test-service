@@ -1,6 +1,8 @@
-const { getRandomNumber } = require('../../../src/common/utils');
+/* eslint-disable import/prefer-default-export */
+import { getRandomNumber } from '../../../common/utils';
+import RideReqDTO from '../../../rides/types/RideReqDTO';
 
-function generateRideReqDTO(overrides) {
+export function generateRideReqDTO(overrides?: Partial<RideReqDTO>): RideReqDTO {
     return {
         start_lat: getRandomNumber(-90, 90),
         start_long: getRandomNumber(-180, 180),
@@ -12,7 +14,3 @@ function generateRideReqDTO(overrides) {
         ...overrides,
     };
 }
-
-module.exports = {
-    generateRideReqDTO,
-};

@@ -1,10 +1,10 @@
-const sqlite3 = require('sqlite3').verbose();
-const buildSchemas = require('./src/schemas');
-const createApp = require('./src/app');
-const logger = require('./src/common/logger');
+import sqlite3 from 'sqlite3';
+import buildSchemas from './schemas';
+import createApp from './app';
+import logger from './common/logger';
 
 const port = 8010;
-const db = new sqlite3.Database(':memory:');
+const db = new (sqlite3.verbose().Database)(':memory:');
 
 db.serialize(async () => {
     await buildSchemas(db);

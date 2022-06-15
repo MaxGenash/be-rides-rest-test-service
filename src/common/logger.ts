@@ -1,5 +1,5 @@
-const winston = require('winston');
-const { isDevEnv } = require('../utils/envUtils');
+import winston from 'winston';
+import { isDevEnv } from '../utils/envUtils';
 
 const getLogLevel = () => {
     return isDevEnv ? 'debug' : 'warn';
@@ -37,4 +37,6 @@ const logger = winston.createLogger({
     transports,
 });
 
-module.exports = logger;
+export type Logger = winston.Logger;
+
+export default logger;

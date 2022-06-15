@@ -1,14 +1,16 @@
-const express = require('express');
-const expressWinston = require('express-winston');
-const bodyParser = require('body-parser');
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./api/v1/openapi.json');
-const { isDevEnv } = require('./utils/envUtils');
+import express from 'express';
+import expressWinston from 'express-winston';
+import bodyParser from 'body-parser';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './api/v1/openapi.json';
+import { isDevEnv } from './utils/envUtils';
+import { Logger } from './common/logger';
+import { DBDriver } from './common/db/types';
 
 const app = express();
 const jsonParser = bodyParser.json();
 
-module.exports = (db, logger) => {
+export default function createApp(db: DBDriver, logger: Logger) {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use(
@@ -170,20 +172,21 @@ module.exports = (db, logger) => {
         expressWinston.errorLogger({
             winstonInstance: logger,
             meta: true,
-            statusLevels: true,
-            expressFormat: true,
         }),
     );
 
     // eslint-disable-next-line no-unused-vars
-    app.use((error, req, res, next) => {
-        logger.error('Unhandled middleware error:', error);
-        res.status(error.status || 500);
-        res.send({
-            error_code: 'SERVER_ERROR',
-            message: 'Unknown error',
-        });
-    });
+    app.use(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-explicit-any
+        (error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            logger.error('Unhandled middleware error:', error);
+            res.status(error.status || 500);
+            res.send({
+                error_code: 'SERVER_ERROR',
+                message: 'Unknown error',
+            });
+        },
+    );
 
     return app;
-};
+}
