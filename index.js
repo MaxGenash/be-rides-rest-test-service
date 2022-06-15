@@ -6,8 +6,8 @@ const logger = require('./src/common/logger');
 const port = 8010;
 const db = new sqlite3.Database(':memory:');
 
-db.serialize(() => {
-    buildSchemas(db);
+db.serialize(async () => {
+    await buildSchemas(db);
     app(db).listen(port, () => logger.info(`App started and listening on port ${port}`));
 });
 

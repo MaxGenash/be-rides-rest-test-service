@@ -1,4 +1,6 @@
-module.exports = (db) => {
+const { promisify } = require('util');
+
+module.exports = async (db) => {
     const createRideTableSchema = `
         CREATE TABLE Rides
         (
@@ -14,7 +16,7 @@ module.exports = (db) => {
         )
     `;
 
-    db.run(createRideTableSchema);
+    await promisify(db.run.bind(db))(createRideTableSchema);
 
     return db;
 };
