@@ -1,17 +1,15 @@
-import sqlite3 from 'sqlite3';
-import buildSchemas from './schemas';
 import createApp from './app';
+import { initDB } from './common/db/sqlLiteDriver';
 import logger from './common/logger';
 
 const port = 8010;
-const db = new (sqlite3.verbose().Database)(':memory:');
 
-db.serialize(async () => {
-    await buildSchemas(db);
-    createApp(db, logger).listen(port, () =>
-        logger.info(`App started and listening on port ${port}`),
-    );
-});
+async function run() {
+    const db = await initDB();
+    const app = createApp(db, logger);
+    app.listen(port, () => logger.info(`App started and listening on port ${port}`));
+}
+run().catch((error) => logger.error(`Failed to run the server:`, error));
 
 process.on('uncaughtException', (error) => {
     logger.error(`Unhandled Exception:`, error);

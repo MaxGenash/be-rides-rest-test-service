@@ -2,10 +2,12 @@ import express from 'express';
 import expressWinston from 'express-winston';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
+import { promisify } from 'util';
 import swaggerDocument from './api/v1/openapi.json';
 import { isDevEnv } from './utils/envUtils';
-import { Logger } from './common/logger';
+import type { Logger } from './common/logger';
 import { DBDriver } from './common/db/types';
+import RideResDTO from './rides/types/RideResDTO';
 
 const app = express();
 const jsonParser = bodyParser.json();
@@ -24,7 +26,7 @@ export default function createApp(db: DBDriver, logger: Logger) {
 
     app.get('/health', (req, res) => res.send('Healthy'));
 
-    app.post('/rides', jsonParser, (req, res) => {
+    app.post('/rides', jsonParser, async (req, res) => {
         const startLatitude = Number(req.body.start_lat);
         const startLongitude = Number(req.body.start_long);
         const endLatitude = Number(req.body.end_lat);
@@ -85,80 +87,70 @@ export default function createApp(db: DBDriver, logger: Logger) {
             req.body.driver_vehicle,
         ];
 
-        return db.run(
-            'INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            values,
-            function insertCallback(insertErr) {
-                if (insertErr) {
-                    logger.error('Failed to insert a Rides record:', insertErr);
-                    return res.send({
-                        error_code: 'SERVER_ERROR',
-                        message: 'Unknown error',
-                    });
-                }
-
-                return db.all(
-                    'SELECT * FROM Rides WHERE rideID = ?',
-                    this.lastID,
-                    (findLastResultErr, rows) => {
-                        if (findLastResultErr) {
-                            logger.error(
-                                'Failed to retrieve a created Ride record:',
-                                findLastResultErr,
-                            );
-                            return res.send({
-                                error_code: 'SERVER_ERROR',
-                                message: 'Unknown error',
-                            });
-                        }
-
-                        return res.send(rows);
+        try {
+            const insertId = await new Promise<number>((resolve, reject) => {
+                db.run(
+                    'INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    values,
+                    function insertCallback(err) {
+                        return err ? reject(err) : resolve(this.lastID);
                     },
                 );
-            },
-        );
+            });
+            const rows = await promisify<string, number, RideResDTO[]>(db.all.bind(db))(
+                'SELECT * FROM Rides WHERE rideID = ?',
+                insertId,
+            );
+            return res.send(rows);
+        } catch (error) {
+            logger.error('Failed to insert a Rides record:', error);
+            return res.send({
+                error_code: 'SERVER_ERROR',
+                message: 'Unknown error',
+            });
+        }
     });
 
-    app.get('/rides', (req, res) => {
-        db.all('SELECT * FROM Rides', (error, rows) => {
-            if (error) {
-                logger.error('Failed to find Rides records:', error);
-                return res.send({
-                    error_code: 'SERVER_ERROR',
-                    message: 'Unknown error',
-                });
-            }
-
+    app.get('/rides', async (req, res) => {
+        try {
+            const rows = await promisify<string, RideResDTO[]>(db.all.bind(db))(
+                'SELECT * FROM Rides',
+            );
             if (rows.length === 0) {
                 return res.send({
                     error_code: 'RIDES_NOT_FOUND_ERROR',
                     message: 'Could not find any rides',
                 });
             }
-
             return res.send(rows);
-        });
+        } catch (error) {
+            logger.error('Failed to find Rides records:', error);
+            return res.send({
+                error_code: 'SERVER_ERROR',
+                message: 'Unknown error',
+            });
+        }
     });
 
-    app.get('/rides/:id', (req, res) => {
-        db.all(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`, (error, rows) => {
-            if (error) {
-                logger.error('Failed to insert a ride record to DB:', error);
-                return res.send({
-                    error_code: 'SERVER_ERROR',
-                    message: 'Unknown error',
-                });
-            }
-
+    app.get('/rides/:id', async (req, res) => {
+        try {
+            const rows = await promisify<string, RideResDTO[]>(db.all.bind(db))(
+                `SELECT * FROM Rides WHERE rideID='${req.params.id}'`,
+            );
             if (rows.length === 0) {
                 return res.send({
                     error_code: 'RIDES_NOT_FOUND_ERROR',
                     message: 'Could not find any rides',
                 });
             }
-
             return res.send(rows);
-        });
+        } catch (error) {
+            logger.error('Failed to find a ride record by id:', error);
+            return res.send({
+                error_code: 'SERVER_ERROR',
+                message: 'Unknown error',
+            });
+        }
     });
 
     app.use((req, res) => {
