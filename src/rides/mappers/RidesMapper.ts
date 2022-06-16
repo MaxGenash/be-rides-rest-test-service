@@ -1,5 +1,5 @@
 import EntityToResDTOMapper from '../../common/mappers/EntityToResDTOMapper';
-import RideEntity from '../types/RideEntity';
+import RideEntity, { NewRideEntity } from '../types/RideEntity';
 import RideResDTO from '../types/RideResDTO';
 import RideReqDTO from '../types/RideReqDTO';
 import ReqDTOToEntityMapper from '../../common/mappers/ReqDTOToEntityMapper';
@@ -7,9 +7,9 @@ import ReqDTOToEntityMapper from '../../common/mappers/ReqDTOToEntityMapper';
 export default class RidesMapper
     implements
         EntityToResDTOMapper<RideEntity, RideResDTO>,
-        ReqDTOToEntityMapper<RideReqDTO, RideEntity>
+        ReqDTOToEntityMapper<RideReqDTO, NewRideEntity>
 {
-    mapReqDTOToEntity(dto: RideReqDTO): RideEntity {
+    mapReqDTOToEntity(dto: RideReqDTO): NewRideEntity {
         return {
             startLat: Number(dto.start_lat),
             startLong: Number(dto.start_long),

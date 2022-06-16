@@ -1,20 +1,26 @@
+import type { Express } from 'express';
 import request from 'supertest';
-import createApp from '../app';
-import { db, initDB } from '../common/db/sqlLiteDriver';
-import { generateRideReqDTO } from './helpers/factories/rides';
-import RidesRepo from '../rides/repositories/RidesRepo';
-import RidesMapper from '../rides/mappers/RidesMapper';
-import loggerMock from '../common/logger';
+import createApp from '../../app';
+import { initDB } from '../../common/db/sqlLiteDriver';
+import { generateRideReqDTO } from '../helpers/factories/rides';
+import RidesRepo from '../../rides/repositories/RidesRepo';
+import RidesMapper from '../../rides/mappers/RidesMapper';
+import loggerMock from '../../common/logger';
+import type { DBDriver } from '../../common/db/types';
+import RideEntity from '../../rides/types/RideEntity';
 
-jest.mock('../common/logger');
+jest.mock('../../common/logger');
 
-const app = createApp(db, loggerMock);
-const ridesRepo = new RidesRepo(db);
+let db: DBDriver;
+let app: Express;
+let ridesRepo: RidesRepo;
 const ridesMapper = new RidesMapper();
 
-describe('API tests', () => {
+describe('Rides API tests', () => {
     beforeAll(async () => {
-        await initDB();
+        db = await initDB();
+        app = createApp(db, loggerMock);
+        ridesRepo = new RidesRepo(db);
     });
 
     afterEach(async () => {
@@ -23,67 +29,6 @@ describe('API tests', () => {
 
     afterAll(async () => {
         jest.restoreAllMocks();
-    });
-
-    describe('GET /api-docs', () => {
-        it('should return HTML with API docs', async () => {
-            const res = await request(app).get('/api-docs/');
-
-            expect(res.headers['content-type']).toContain('text/html');
-            expect(res.statusCode).toBe(200);
-            expect(res.text).toContain('swagger');
-        });
-    });
-
-    describe('GET /health', () => {
-        it('should return health', async () => {
-            const res = await request(app).get('/health');
-
-            expect(res.headers['content-type']).toContain('text');
-            expect(res.statusCode).toBe(200);
-        });
-    });
-
-    describe('Not existing routes', () => {
-        it('GET should return NOT_FOUND error with status 404', async () => {
-            const res = await request(app).get('/some_not_existing_route');
-
-            expect(res.headers['content-type']).toContain('json');
-            expect(res.statusCode).toBe(404);
-            expect(res.body).toMatchObject({
-                error_code: 'NOT_FOUND',
-            });
-        });
-
-        it('POST should return NOT_FOUND error with status 404', async () => {
-            const res = await request(app).post('/some_not_existing_route');
-
-            expect(res.headers['content-type']).toContain('json');
-            expect(res.statusCode).toBe(404);
-            expect(res.body).toMatchObject({
-                error_code: 'NOT_FOUND',
-            });
-        });
-
-        it('PUT should return NOT_FOUND error with status 404', async () => {
-            const res = await request(app).put('/some_not_existing_route');
-
-            expect(res.headers['content-type']).toContain('json');
-            expect(res.statusCode).toBe(404);
-            expect(res.body).toMatchObject({
-                error_code: 'NOT_FOUND',
-            });
-        });
-
-        it('DELETE should return NOT_FOUND error with status 404', async () => {
-            const res = await request(app).delete('/some_not_existing_route');
-
-            expect(res.headers['content-type']).toContain('json');
-            expect(res.statusCode).toBe(404);
-            expect(res.body).toMatchObject({
-                error_code: 'NOT_FOUND',
-            });
-        });
     });
 
     describe('POST /rides', () => {
@@ -122,7 +67,7 @@ describe('API tests', () => {
         it('should return the created records when the payload is valid and no DB errors', async () => {
             const rideReqDTO = generateRideReqDTO();
             const expectedPartialResDTO = ridesMapper.mapEntityToResDTO(
-                ridesMapper.mapReqDTOToEntity(rideReqDTO),
+                ridesMapper.mapReqDTOToEntity(rideReqDTO) as RideEntity,
             );
 
             const res = await request(app).post('/rides').send(rideReqDTO);
@@ -190,7 +135,7 @@ describe('API tests', () => {
             expect(res.body).toHaveLength(rideItemsCount);
             for (const rideReqDTO of rideReqDTOs) {
                 const expectedPartialResDTO = ridesMapper.mapEntityToResDTO(
-                    ridesMapper.mapReqDTOToEntity(rideReqDTO),
+                    ridesMapper.mapReqDTOToEntity(rideReqDTO) as RideEntity,
                 );
                 expect(res.body).toContainEqual({
                     ...expectedPartialResDTO,
@@ -214,7 +159,7 @@ describe('API tests', () => {
 
         it('should return SERVER_ERROR when there is an internal error when performing the request', async () => {
             const dbAllStub = jest
-                .spyOn(db, 'all')
+                .spyOn(db, 'get')
                 .mockImplementation((sql, cb) => cb(new Error('Something is Wrong')));
 
             const res = await request(app).get('/rides/1').send();
@@ -231,7 +176,7 @@ describe('API tests', () => {
         it('should return the Ride when it is found', async () => {
             const rideReqDTO = generateRideReqDTO();
             const expectedPartialResDTO = ridesMapper.mapEntityToResDTO(
-                ridesMapper.mapReqDTOToEntity(rideReqDTO),
+                ridesMapper.mapReqDTOToEntity(rideReqDTO) as RideEntity,
             );
             // We prepare the data using API instead of raw DB so that if the endpoint implementation
             // changes (e.g. we start collecting the data for this endpoint from 2 different sources)

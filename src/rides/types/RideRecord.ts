@@ -1,4 +1,4 @@
-export interface NewRideEntity {
+export interface NewRideRecord {
     startLat: number;
     startLong: number;
     endLat: number;
@@ -8,7 +8,7 @@ export interface NewRideEntity {
     driverVehicle: string;
 }
 
-export default interface RideEntity extends NewRideEntity {
+export default interface RideRecord extends NewRideRecord {
     rideID: number;
     created: string;
 }

@@ -1,5 +1,5 @@
 import { promisify } from 'util';
-import { DBDriver } from './common/db/types';
+import { DBDriver } from './types';
 
 export default async (db: DBDriver) => {
     const createRideTableSchema = `
