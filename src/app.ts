@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import expressWinston from 'express-winston';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './api-docs/v1/openapi.json';
@@ -10,6 +11,8 @@ import ridesRouter from './rides/routes';
 const app = express();
 
 export default function createApp(db: DBDriver, logger: Logger) {
+    app.use(helmet());
+
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use(
