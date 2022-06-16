@@ -2,8 +2,8 @@
     "openapi": "3.0.0",
     "info": {
         "version": "1.0.0",
-        "title": "Xendit Rides service",
-        "description": "The goal of this project is to assess your proficiency in software engineering that is related to the daily work that we do at Xendit"
+        "title": "Rides service",
+        "description": "The goal of this project is to assess your proficiency in software engineering that is related to the daily work that we do at the company"
     },
     "servers": [
         {
