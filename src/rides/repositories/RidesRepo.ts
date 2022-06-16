@@ -33,8 +33,9 @@ export default class RidesRepo {
 
     async findOne({ filters }: QueryParams): Promise<RideRecord> {
         // TODO (Future): add more filters when needed
-        return promisify<string, RideRecord>(this.db.get.bind(this.db))(
-            `SELECT * FROM Rides WHERE rideID='${filters.rideID}'`,
+        return promisify<string, number, RideRecord>(this.db.get.bind(this.db))(
+            `SELECT * FROM Rides WHERE rideID = ?`,
+            filters.rideID,
         );
     }
 
