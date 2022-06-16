@@ -1,0 +1,33 @@
+# Full docs: https://www.artillery.io/docs
+config:
+    target: 'http://localhost:8010'
+    timeout: 300
+    phases:
+        - duration: 30
+          arrivalRate: 100
+          name: Sustained load
+    ensure:
+        p99: 50
+
+scenarios:
+    - name: 'Create a ride'
+      flow:
+          - post:
+                url: '/rides'
+                json:
+                    data:
+                        'start_lat': 1
+                        'start_long': 1
+                        'end_lat': 1
+                        'end_long': 1
+                        'rider_name': 'some rider name'
+                        'driver_name': 'some driver name'
+                        'driver_vehicle': 'some driver vehicle'
+    - name: 'Fetch all rides'
+      flow:
+          - get:
+                url: '/rides'
+    - name: 'Fetch one ride'
+      flow:
+          - get:
+                url: '/rides/1'
