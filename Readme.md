@@ -90,3 +90,31 @@ Please implement load testing to ensure your service can handle a high amount of
     1. Create a PR against `master` including artillery
     2. Ensure that load testing is able to be run using `npm test:load`. You can consider using a tool like `forever` to spin up a daemon and kill it after the load test has completed.
     3. Test all endpoints under at least `100 rps` for `30s` and ensure that `p99` is under `50ms`
+
+## Implementation notes:
+
+I avoided breaking changes to the API since in real-world apps it should be done only after upgrading
+the API version. So I left only the improvement ideas about what to fix there.
+
+I implemented a layered architecture based on Controllers, Services and Repos. Controllers work with
+"DTO" objects (=request/response data), Services work with "Entity" objects, Repos work with "Record"
+objects. If we had some business logic (not only CRUD operations) it would make sense to also add
+UseCase (aka Interactor) classes to coordinate other classes.
+
+Implemented extra improvements (since they weren't forbidden by the task :D):
+
+1. Added .nvmrc to lock Node.js version for people that use nvm (node version manager).
+2. Specified supported Node.js and NPM versions in package.json engines.
+3. Upgraded Node.js to 16x since 8x and 10x are deprecated and were dropped by some dependencies.
+4. Replaced mocha and nyc with jest since it has them out-of-the-box under the hood and is more convenient (at least for me :D).
+
+Improvement ideas:
+
+1. Add versions to the API, e.g. ‘/api/v1/rides’ instead of ‘/rides’.
+2. API request and response data for /rides should be in the same format; now request fields use snake case (e.g. rider_name), but response fields use camel case (e.g. riderName). Also, in SQL it’s more common to use snake case for field names (now we use camel case).
+3. Return proper HTTP status codes for errors (e.g. 500, not 200). Return 201 for created records.
+4. Requests to one entity (e.g. /rides/7) should return one entity, but now it returns an array of them.
+5. Use a better back-end framework like Nest.js or Fastify depending on planned project size.
+6. Add a dependency injection container, e.g. Inversify if we choose Fastify or Express (Nest.js has an own DI container).
+7. Consider moving API to GraphQL if we are gonna communicate with front-end, or gRPC if we are gonna communicate with other internal microservices.
+8. Use a proper ORM to build DB requests.
